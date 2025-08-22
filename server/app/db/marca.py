@@ -1,34 +1,28 @@
 from typing import List, Optional
 
 from .database import supabase
-from app.schemas.marca import MarcaCreate, MarcaUpdate
+from app.schemas.marca import MarcaCreate, MarcaUpdate, MarcaInDBBase
+from app.schemas.historial_estado import HistorialEstado
+from datetime import datetime
 
 
-def get(*, marca_id: int) -> Optional[dict]:
+def get(*, marca_id: int) -> Optional[MarcaInDBBase]:
     """
     Get a single marca by ID.
     """
     response = supabase.table("marcas").select("*").eq("id", marca_id).single().execute()
-    return response.data
+    return MarcaInDBBase(**response.data)
 
 
-def get_by_nombre(*, nombre: str) -> Optional[dict]:
-    """
-    Get a single marca by name to check for existence.
-    """
-    response = supabase.table("marcas").select("id").eq("nombre", nombre).execute()
-    return response.data[0] if response.data else None
-
-
-def get_multi(*, skip: int = 0, limit: int = 100) -> List[dict]:
+def get_multi(*, skip: int = 0, limit: int = 100) -> List[MarcaInDBBase]:
     """
     Get multiple marcas with pagination.
     """
     response = supabase.table("marcas").select("*").range(skip, skip + limit - 1).execute()
-    return response.data
+    return [MarcaInDBBase(**marca) for marca in response.data]
 
 
-def create(*, marca_in: MarcaCreate) -> dict:
+def create(*, marca_in: MarcaCreate) -> MarcaInDBBase:
     """
     Create a new marca.
     """
@@ -42,41 +36,45 @@ def create(*, marca_in: MarcaCreate) -> dict:
         "estado": marca_in.estado.value
     }
     response = supabase.table("marcas").insert(marca_data).execute()
-    return response.data[0]
+    return MarcaInDBBase(**response.data[0])
 
 
-def update(*, marca_id: int, marca_in: MarcaUpdate) -> Optional[dict]:
+def update(*, marca_id: int, marca_in: MarcaUpdate) -> Optional[MarcaInDBBase]:
     """
     Update an existing marca.
     """
+    existing_marca = get(marca_id=marca_id)
+
     update_data = marca_in.model_dump(exclude_unset=True)
     
     if "estado" in update_data and update_data["estado"] is not None:
+
+        if update_data["estado"] != existing_marca.estado:
+            # Create a new historial estado
+            historial_estado = HistorialEstado(
+                marca_id=marca_id,
+                estado=update_data["estado"],
+            )
+
+            supabase.table("historial_estados").insert(historial_estado.model_dump()).execute()
+
         update_data["estado"] = update_data["estado"].value
     
     response = supabase.table("marcas").update(update_data).eq("id", marca_id).execute()
-    return response.data[0] if response.data else None
+    return MarcaInDBBase(**response.data[0]) if response.data else None
 
 
-def delete(*, marca_id: int) -> Optional[dict]:
+def delete(*, marca_id: int) -> Optional[MarcaInDBBase]:
     """
     Delete a marca. Returns the deleted record.
     """
     response = supabase.table("marcas").delete().eq("id", marca_id).execute()
-    return response.data[0] if response.data else None
+    return MarcaInDBBase(**response.data[0]) if response.data else None
 
 
-def get_by_estado(*, estado: str) -> List[dict]:
+def get_by_nombre(*, nombre: str) -> Optional[MarcaInDBBase]:
     """
-    Get marcas filtered by estado.
+    Get a single marca by name.
     """
-    response = supabase.table("marcas").select("*").eq("estado", estado).execute()
-    return response.data
-
-
-def get_by_pais(*, pais_id: int) -> List[dict]:
-    """
-    Get marcas filtered by pais_id.
-    """
-    response = supabase.table("marcas").select("*").eq("pais_id", pais_id).execute()
-    return response.data
+    response = supabase.table("marcas").select("*").eq("nombre", nombre).single().execute()
+    return MarcaInDBBase(**response.data) if response.data else None

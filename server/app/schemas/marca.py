@@ -44,16 +44,8 @@ class MarcaInDBBase(MarcaBase):
 
     model_config = {"from_attributes": True}
 
-
-class Marca(MarcaInDBBase):
-    pass
-
-
-class MarcaInDB(MarcaInDBBase):
-    pass
-
 class MarcaPagination(BaseModel):
-    items: List[Marca]
+    items: List[MarcaInDBBase]
     total: int
     page: int
     limit: int

@@ -1,4 +1,4 @@
 # Pydantic schemas for request/response models
-from .marca import Marca, MarcaCreate, MarcaUpdate
+from .marca import MarcaInDBBase, MarcaCreate, MarcaUpdate
 
-__all__ = ["Marca", "MarcaCreate", "MarcaUpdate"]
+__all__ = ["MarcaInDBBase", "MarcaCreate", "MarcaUpdate"]

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, status
 from typing import List
 
-from app.schemas.marca import Marca, MarcaCreate, MarcaPagination, MarcaUpdate
+from app.schemas.marca import EstadoMarca, MarcaInDBBase, MarcaCreate, MarcaPagination, MarcaUpdate
 from app.db import marca as marcaDAO
 
 router = APIRouter()
@@ -30,7 +30,7 @@ def read_marcas(
         )
 
 
-@router.post("/", response_model=Marca, status_code=status.HTTP_201_CREATED)
+@router.post("/", response_model=MarcaInDBBase, status_code=status.HTTP_201_CREATED)
 def create_marca(
     *,
     marca_in: MarcaCreate
@@ -58,7 +58,7 @@ def create_marca(
         )
 
 
-@router.get("/{marca_id}", response_model=Marca)
+@router.get("/{marca_id}", response_model=MarcaInDBBase)
 def read_marca(
     *,
     marca_id: int
@@ -83,7 +83,7 @@ def read_marca(
         )
 
 
-@router.put("/{marca_id}", response_model=Marca)
+@router.put("/{marca_id}", response_model=MarcaInDBBase)
 def update_marca(
     *,
     marca_id: int,
@@ -93,12 +93,23 @@ def update_marca(
     Update marca.
     """
     try:
-        updated_marca = marcaDAO.update(marca_id=marca_id, marca_in=marca_in)
-        if updated_marca is None:
+        existing_marca = marcaDAO.get(marca_id=marca_id)
+        if not existing_marca:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Marca not found"
             )
+        
+        if marca_in.nombre != existing_marca.nombre:
+            existing_marca_with_same_name = marcaDAO.get_by_nombre(nombre=marca_in.nombre)
+            if existing_marca_with_same_name:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="A marca with this name already exists."
+                )
+        
+        updated_marca = marcaDAO.update(marca_id=marca_id, marca_in=marca_in)
+
         return updated_marca
         
     except HTTPException:
@@ -119,12 +130,20 @@ def delete_marca(
     Delete marca.
     """
     try:
-        deleted_marca = marcaDAO.delete(marca_id=marca_id)
-        if deleted_marca is None:
+        existing_marca = marcaDAO.get(marca_id=marca_id)
+        if not existing_marca:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Marca not found"
             )
+        
+        if existing_marca.estado != EstadoMarca.SOLICITUD_PRESENTADA:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Marca cannot be deleted because it is not in the SOLICITUD_PRESENTADA state."
+            )
+        
+        deleted_marca = marcaDAO.delete(marca_id=marca_id)
         return {"message": "Marca deleted successfully"}
         
     except HTTPException:
