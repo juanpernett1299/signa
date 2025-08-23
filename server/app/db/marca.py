@@ -10,8 +10,12 @@ def get(*, marca_id: int) -> Optional[MarcaInDBBase]:
     """
     Get a single marca by ID.
     """
-    response = supabase.table("marcas").select("*").eq("id", marca_id).single().execute()
-    return MarcaInDBBase(**response.data)
+    try:
+        response = supabase.table("marcas").select("*").eq("id", marca_id).execute()
+        return MarcaInDBBase(**response.data[0])
+    except Exception as e:
+        print(f"Error getting marca by ID: {e}")
+        return None
 
 
 def get_multi(*, skip: int = 0, limit: int = 100) -> List[MarcaInDBBase]:
@@ -76,5 +80,5 @@ def get_by_nombre(*, nombre: str) -> Optional[MarcaInDBBase]:
     """
     Get a single marca by name.
     """
-    response = supabase.table("marcas").select("*").eq("nombre", nombre).single().execute()
-    return MarcaInDBBase(**response.data) if response.data else None
+    response = supabase.table("marcas").select("id").eq("nombre", nombre).execute()
+    return response.data[0] if response.data else None
