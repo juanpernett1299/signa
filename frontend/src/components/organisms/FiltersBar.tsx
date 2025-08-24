@@ -30,7 +30,7 @@ export const FiltersBar = ({ onFiltersChange }: FiltersBarProps) => {
         setPaises(paisesData);
         setClasesNiza(clasesData);
       })
-      .catch(error => {
+      .catch(() => {
         showSnackbar('Error al cargar datos para filtros', 'error');
       });
   }, []);

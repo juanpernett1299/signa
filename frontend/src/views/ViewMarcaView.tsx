@@ -57,7 +57,7 @@ export const ViewMarcaView = () => {
           setMarcaData(wizardData);
         }
       })
-      .catch(error => {
+      .catch(() => {
         showSnackbar('Error al cargar los datos de la marca', 'error');
         setMarcaData(null); // Limpiar datos en caso de error
       })

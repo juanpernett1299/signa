@@ -44,7 +44,7 @@ export const HomeView = () => {
           limit: response.limit
         });
       })
-      .catch((err: any) => {
+      .catch(() => {
         showSnackbar('Error al cargar las marcas', 'error');
       })
       .finally(() => {
@@ -57,7 +57,7 @@ export const HomeView = () => {
       .then(clases => {
         setClasesNiza(clases);
       })
-      .catch(err => {
+      .catch(() => {
         showSnackbar('Error al cargar datos de Clases Niza', 'error');
       });
   };

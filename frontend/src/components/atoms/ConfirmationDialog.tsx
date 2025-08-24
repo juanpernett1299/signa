@@ -4,7 +4,6 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  Button,
   Box
 } from '@mui/material';
 import { FormButton } from './FormButton';
