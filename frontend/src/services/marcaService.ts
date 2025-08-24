@@ -17,7 +17,7 @@ export const getMarcasPaginadas = async (
       params.filters = JSON.stringify(filters);
     }
 
-    const response = await api.get(`/api/v1/marcas/`, { params });
+    const response = await api.get(`/marcas/`, { params });
     return response.data;
   } catch (error) {
     console.error('Error fetching marcas:', error);
@@ -26,17 +26,17 @@ export const getMarcasPaginadas = async (
 };
 
 export const getMarcaById = (id: number): Promise<Marca | null> => {
-  return api.get(`/api/v1/marcas/${id}`).then(response => response.data);
+  return api.get(`/marcas/${id}`).then(response => response.data);
 };
 
 export const createMarca = (marcaData: MarcaCreate): Promise<Marca> => {
-  return api.post('/api/v1/marcas/', marcaData).then(response => response.data);
+  return api.post('/marcas/', marcaData).then(response => response.data);
 };
 
 export const updateMarca = (id: number, marcaData: MarcaUpdate): Promise<Marca> => {
-  return api.put(`/api/v1/marcas/${id}`, marcaData).then(response => response.data);
+  return api.put(`/marcas/${id}`, marcaData).then(response => response.data);
 };
 
 export const deleteMarca = (id: number): Promise<void> => {
-  return api.delete(`/api/v1/marcas/${id}`).then(response => response.data);
+  return api.delete(`/marcas/${id}`).then(response => response.data);
 };

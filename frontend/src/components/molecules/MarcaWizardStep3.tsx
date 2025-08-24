@@ -62,14 +62,14 @@ export const MarcaWizardStep3 = ({
           <Grid container spacing={3}>
             {/* Logo */}
             {marcaData.logo_url && (
-              <Grid item xs={12}>
+              <Grid size={{xs: 12}}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                   <Logo src={marcaData.logo_url} alt={marcaData.nombre} size={60} />
                 </Box>
               </Grid>
             )}
 
-            <Grid item xs={12} sm={6}>
+            <Grid size={{xs: 12, sm: 6}}>
               <Box>
                 <Typography variant="body2" sx={{ color: '#888888', mb: 0.5 }}>
                   Nombre de la Marca
@@ -80,7 +80,7 @@ export const MarcaWizardStep3 = ({
               </Box>
             </Grid>
 
-            <Grid item xs={12} sm={6}>
+            <Grid size={{xs: 12, sm: 6}}>
               <Box>
                 <Typography variant="body2" sx={{ color: '#888888', mb: 0.5 }}>
                   País
@@ -91,7 +91,7 @@ export const MarcaWizardStep3 = ({
               </Box>
             </Grid>
 
-            <Grid item xs={12}>
+            <Grid size={{xs: 12}}>
               <Box>
                 <Typography variant="body2" sx={{ color: '#888888', mb: 0.5 }}>
                   Descripción
@@ -102,7 +102,7 @@ export const MarcaWizardStep3 = ({
               </Box>
             </Grid>
 
-            <Grid item xs={12}>
+            <Grid size={{xs: 12}}>
               <Box>
                 <Typography variant="body2" sx={{ color: '#888888', mb: 0.5 }}>
                   Clase Niza
@@ -113,7 +113,7 @@ export const MarcaWizardStep3 = ({
               </Box>
             </Grid>
 
-            <Grid item xs={12} sm={6}>
+            <Grid size={{xs: 12, sm: 6}}>
               <Box>
                 <Typography variant="body2" sx={{ color: '#888888', mb: 0.5 }}>
                   Estado
@@ -133,7 +133,7 @@ export const MarcaWizardStep3 = ({
           </Typography>
           
           <Grid container spacing={3}>
-            <Grid item xs={12}>
+            <Grid size={{xs: 12}}>
               <Box>
                 <Typography variant="body2" sx={{ color: '#888888', mb: 0.5 }}>
                   Nombre del Titular

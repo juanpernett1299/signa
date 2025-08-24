@@ -1,12 +1,14 @@
-export enum EstadoMarca {
-  SOLICITUD_PRESENTADA = 'solicitud_presentada',
-  EXAMEN_FORMAL = 'examen_formal',
-  EXAMEN_FONDO = 'examen_fondo',
-  PUBLICACION_GACETA = 'publicacion_gaceta',
-  OPOSICIONES = 'oposiciones',
-  OTORGADA = 'otorgada',
-  RENOVACION = 'renovacion'
-}
+export const EstadoMarca = {
+  SOLICITUD_PRESENTADA: 'solicitud_presentada',
+  EXAMEN_FORMAL: 'examen_formal',
+  EXAMEN_FONDO: 'examen_fondo',
+  PUBLICACION_GACETA: 'publicacion_gaceta',
+  OPOSICIONES: 'oposiciones',
+  OTORGADA: 'otorgada',
+  RENOVACION: 'renovacion'
+} as const;
+
+export type EstadoMarca = (typeof EstadoMarca)[keyof typeof EstadoMarca];
 
 export const estadoLabels: Record<EstadoMarca, string> = {
   [EstadoMarca.SOLICITUD_PRESENTADA]: 'Solicitud Presentada',

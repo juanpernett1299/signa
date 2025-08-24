@@ -7,7 +7,6 @@ import {
   Typography,
   OutlinedInput,
   Checkbox,
-  ListItemText as MuiListItemText,
   Divider,
   MenuItem
 } from '@mui/material';
@@ -471,7 +470,7 @@ export const FilterMenu = ({
               <MenuItem value="" disabled>
                 Seleccionar país
               </MenuItem>
-              {paises.map((pais) => (
+              {paises && paises.map((pais) => (
                 <MenuItem
                   key={pais.id}
                   value={pais.id.toString()}

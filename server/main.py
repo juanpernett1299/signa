@@ -1,7 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 import uvicorn
+from fastapi.responses import FileResponse
+import os
 
 from app.shared.config import settings
 from app.api.v1.api import api_router
@@ -36,15 +39,24 @@ app.add_middleware(
 # Set base route on /api/v1
 app.include_router(api_router, prefix=settings.API_V1_STR)
 
+# This must come after all other API routes are registered
+# Mount the static files (the compiled frontend) if the directory exists
+static_files_dir = "frontend/dist"
 
-@app.get("/")
-async def root():
-    return {"message": "Bienvenido a la API de Signa"}
+if os.path.isdir(static_files_dir):
+    # Serve static assets
+    app.mount("/assets", StaticFiles(directory=os.path.join(static_files_dir, "assets")), name="static-assets")
+    
+    # Serve other static files like vite.svg or favicon
+    app.mount("/static", StaticFiles(directory=static_files_dir), name="static-root")
 
-
-@app.get("/health")
-async def health_check():
-    return {"status": "healthy"}
+    # Catch-all route to serve index.html for any other path
+    @app.get("/{full_path:path}", response_class=FileResponse)
+    async def serve_react_app(full_path: str):
+        index_path = os.path.join(static_files_dir, "index.html")
+        if not os.path.exists(index_path):
+            return {"detail": "Not Found"}, 404
+        return index_path
 
 
 if __name__ == "__main__":

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, type ReactNode } from 'react';
+import { createContext, useContext, useState, type ReactNode } from 'react';
 import { Snackbar, Alert } from '@mui/material';
 
 type SnackbarSeverity = 'success' | 'error' | 'warning' | 'info';
