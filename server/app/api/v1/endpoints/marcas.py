@@ -26,7 +26,7 @@ def read_marcas(
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error retrieving marcas: {str(e)}"
+            detail=f"Error obteniendo las marcas: {str(e)}"
         )
 
 
@@ -43,7 +43,7 @@ def create_marca(
         if existing_marca:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="A marca with this name already exists."
+                detail="Una marca con este nombre ya existe."
             )
         
         created_marca = marcaDAO.create(marca_in=marca_in)
@@ -54,7 +54,7 @@ def create_marca(
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error creating marca: {str(e)}"
+            detail=f"Error creando la marca: {str(e)}"
         )
 
 
@@ -71,7 +71,7 @@ def read_marca(
         if not marca:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Marca not found"
+                detail="Marca no encontrada"
             )
         return marca
     except HTTPException:
@@ -79,7 +79,7 @@ def read_marca(
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error retrieving marca: {str(e)}"
+            detail=f"Error obteniendo la marca: {str(e)}"
         )
 
 
@@ -97,7 +97,7 @@ def update_marca(
         if not existing_marca:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Marca not found"
+                detail="Marca no encontrada"
             )
         
         if marca_in.nombre != existing_marca.nombre:
@@ -105,7 +105,7 @@ def update_marca(
             if existing_marca_with_same_name:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="A marca with this name already exists."
+                    detail="Una marca con este nombre ya existe."
                 )
         
         updated_marca = marcaDAO.update(marca_id=marca_id, marca_in=marca_in)
@@ -117,7 +117,7 @@ def update_marca(
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error updating marca: {str(e)}"
+            detail=f"Error actualizando la marca: {str(e)}"
         )
 
 
@@ -134,22 +134,23 @@ def delete_marca(
         if not existing_marca:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Marca not found"
+                detail="Marca no encontrada"
             )
         
+        # Se controla que no se pueda eliminar una marca si ya a avanzado el proceso de solicitud de marca
         if existing_marca.estado != EstadoMarca.SOLICITUD_PRESENTADA:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Marca cannot be deleted because it is not in the SOLICITUD_PRESENTADA state."
+                detail="La marca no puede ser eliminada porque no está en el estado solicitud presentada."
             )
         
         deleted_marca = marcaDAO.delete(marca_id=marca_id)
-        return {"message": "Marca deleted successfully"}
+        return {"message": "Marca eliminada exitosamente"}
         
     except HTTPException:
         raise
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error deleting marca: {str(e)}"
+            detail=f"Error eliminando la marca: {str(e)}"
         )

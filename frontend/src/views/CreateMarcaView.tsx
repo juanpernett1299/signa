@@ -3,14 +3,14 @@ import { ArrowBack } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { MarcaWizard } from '../components/organisms/MarcaWizard';
 import { FormButton } from '../components/atoms/FormButton';
-import type { MarcaWizardData } from '../components/organisms/MarcaWizard';
+import type { MarcaFormData } from '../components/organisms/MarcaWizard';
 
 export const CreateMarcaView = () => {
   const navigate = useNavigate();
   const location = useLocation();
   
   // Obtener datos de edición si existen
-  const editData = location.state?.editData as MarcaWizardData | undefined;
+  const editData = location.state?.editData as MarcaFormData | undefined;
   const isEditing = !!editData;
 
   const handleBack = () => {

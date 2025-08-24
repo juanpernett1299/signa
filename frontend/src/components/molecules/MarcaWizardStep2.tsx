@@ -3,28 +3,28 @@ import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 import { FormField } from '../atoms/FormField';
 import { FormButton } from '../atoms/FormButton';
-import type { TitularData } from '../organisms/MarcaWizard';
+import type { MarcaFormData } from '../organisms/MarcaWizard';
 
 interface MarcaWizardStep2Props {
-  data: TitularData;
-  onNext: (stepData: Partial<TitularData>, section: 'marca' | 'titular') => void;
+  data: MarcaFormData;
+  onNext: (stepData: Partial<MarcaFormData>, section: 'marca' | 'titular') => void;
   onBack: () => void;
   isEditing?: boolean;
 }
 
 interface Step2FormValues {
-  nombre: string;
+  titular: string;
 }
 
 const validationSchema = Yup.object({
-  nombre: Yup.string()
+  titular: Yup.string()
     .required('El titular es requerido')
     .min(2, 'El titular debe tener al menos 2 caracteres')
 });
 
 export const MarcaWizardStep2 = ({ data, onNext, onBack, isEditing = false }: MarcaWizardStep2Props) => {
   const initialValues: Step2FormValues = {
-    nombre: data.nombre
+    titular: data.titular
   };
 
   const handleSubmit = (values: Step2FormValues) => {
@@ -43,7 +43,7 @@ export const MarcaWizardStep2 = ({ data, onNext, onBack, isEditing = false }: Ma
           <Form>
             <Stack spacing={3}>
               <FormField
-                name="nombre"
+                name="titular"
                 label="Nombre del Titular"
                 placeholder="Ingrese el nombre del titular de la marca"
               />

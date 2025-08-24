@@ -22,7 +22,7 @@ def get_multi(*, skip: int = 0, limit: int = 100) -> List[MarcaInDBBase]:
     """
     Get multiple marcas with pagination.
     """
-    response = supabase.table("marcas").select("*").range(skip, skip + limit - 1).execute()
+    response = supabase.table("marcas").select("*").order("id", desc=True).range(skip, skip + limit - 1).execute()
     return [MarcaInDBBase(**marca) for marca in response.data]
 
 

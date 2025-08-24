@@ -1,3 +1,6 @@
+import { EstadoMarca } from './estadoMarca';
+
+// Tipo para el objeto Marca completo (respuesta de la API)
 export interface Marca {
   id: number;
   nombre: string;
@@ -10,6 +13,7 @@ export interface Marca {
   fecha_registro: string;
 }
 
+// Tipo para el objeto de Paginación (respuesta de la API)
 export interface MarcaPaginationResponse {
   items: Marca[];
   total: number;
@@ -17,22 +21,10 @@ export interface MarcaPaginationResponse {
   limit: number;
 }
 
-export enum EstadoMarca {
-  SOLICITUD_PRESENTADA = 'solicitud_presentada',
-  EXAMEN_FORMAL = 'examen_formal',
-  EXAMEN_FONDO = 'examen_fondo',
-  PUBLICACION_GACETA = 'publicacion_gaceta',
-  OPOSICIONES = 'oposiciones',
-  OTORGADA = 'otorgada',
-  RENOVACION = 'renovacion'
-}
+// Tipo para crear una nueva marca (payload de la petición POST)
+// Omitimos 'id' y 'fecha_registro' que son generados por el backend
+export type MarcaCreate = Omit<Marca, 'id' | 'fecha_registro'>;
 
-export const estadoLabels: Record<EstadoMarca, string> = {
-  [EstadoMarca.SOLICITUD_PRESENTADA]: 'Solicitud Presentada',
-  [EstadoMarca.EXAMEN_FORMAL]: 'Examen Formal',
-  [EstadoMarca.EXAMEN_FONDO]: 'Examen de Fondo',
-  [EstadoMarca.PUBLICACION_GACETA]: 'Publicación Gaceta',
-  [EstadoMarca.OPOSICIONES]: 'Oposiciones',
-  [EstadoMarca.OTORGADA]: 'Otorgada',
-  [EstadoMarca.RENOVACION]: 'Renovación'
-};
+// Tipo para actualizar una marca (payload de la petición PUT)
+// Hacemos todos los campos opcionales
+export type MarcaUpdate = Partial<MarcaCreate>;

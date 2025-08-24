@@ -1,6 +1,6 @@
 import { FormControl, InputLabel, Select, MenuItem, FormHelperText, Box } from '@mui/material';
 import { useField } from 'formik';
-import { EstadoMarca, estadoLabels } from '../../types/marca';
+import { EstadoMarca } from '../../types/estadoMarca';
 import { StatusChip } from './StatusChip';
 
 interface StatusChipSelectProps {

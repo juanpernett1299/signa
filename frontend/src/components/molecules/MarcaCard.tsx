@@ -1,9 +1,9 @@
 import { Card, CardContent, Typography, Box, Stack } from '@mui/material';
-import { Edit, Visibility } from '@mui/icons-material';
+import { Edit, Visibility, Delete } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import type { Marca } from '../../types/marca';
 import type { ClaseNiza } from '../../types/claseNiza';
-import type { MarcaWizardData } from '../organisms/MarcaWizard';
+import type { MarcaFormData } from '../organisms/MarcaWizard';
 import { Logo } from '../atoms/Logo';
 import { StatusChip } from '../atoms/StatusChip';
 import { ActionButton } from '../atoms/ActionButton';
@@ -11,25 +11,22 @@ import { ActionButton } from '../atoms/ActionButton';
 interface MarcaCardProps {
   marca: Marca;
   clasesNiza: ClaseNiza[];
+  onDelete: (id: number) => void;
 }
 
-export const MarcaCard = ({ marca, clasesNiza }: MarcaCardProps) => {
+export const MarcaCard = ({ marca, clasesNiza, onDelete }: MarcaCardProps) => {
   const navigate = useNavigate();
 
   const handleEdit = () => {
     // Convertir datos de marca a formato del wizard
-    const editData: MarcaWizardData = {
-      marca: {
+    const editData: MarcaFormData = {
         nombre: marca.nombre,
         descripcion: marca.descripcion,
-        paisId: marca.pais_id.toString(),
-        claseNizaId: marca.clase_niza_id.toString(),
-        logoUrl: marca.logo_url,
-        estado: marca.estado
-      },
-      titular: {
-        nombre: marca.titular
-      }
+        pais_id: marca.pais_id.toString(),
+        clase_niza_id: marca.clase_niza_id.toString(),
+        logo_url: marca.logo_url,
+        estado: marca.estado,
+        titular: marca.titular
     };
     
     navigate(`/marcas/edit/${marca.id}`, { state: { editData } });
@@ -37,18 +34,14 @@ export const MarcaCard = ({ marca, clasesNiza }: MarcaCardProps) => {
 
   const handleView = () => {
     // Convertir datos de marca a formato del wizard para visualización
-    const viewData: MarcaWizardData = {
-      marca: {
+    const viewData: MarcaFormData = {
         nombre: marca.nombre,
         descripcion: marca.descripcion,
-        paisId: marca.pais_id.toString(),
-        claseNizaId: marca.clase_niza_id.toString(),
-        logoUrl: marca.logo_url,
-        estado: marca.estado
-      },
-      titular: {
-        nombre: marca.titular
-      }
+        pais_id: marca.pais_id.toString(),
+        clase_niza_id: marca.clase_niza_id.toString(),
+        logo_url: marca.logo_url,
+        estado: marca.estado,
+        titular: marca.titular
     };
     
     navigate(`/marcas/${marca.id}`, { state: { viewData } });
@@ -87,6 +80,11 @@ export const MarcaCard = ({ marca, clasesNiza }: MarcaCardProps) => {
                 icon={<Edit fontSize="small" />}
                 tooltip="Editar marca"
                 onClick={handleEdit}
+              />
+              <ActionButton
+                icon={<Delete fontSize="small" />}
+                tooltip="Eliminar marca"
+                onClick={() => onDelete(marca.id)}
               />
             </Stack>
           </Box>
