@@ -87,7 +87,7 @@ export const MarcaWizardStep1 = ({ data, onNext, isEditing = false }: MarcaWizar
 
   const claseNizaOptions = clasesNiza.map(clase => ({
     id: clase.id,
-    label: `Clase ${clase.codigo} - ${clase.descripcion}`,
+    label: `${clase.codigo} - ${clase.descripcion}`,
     value: clase.id.toString()
   }));
 

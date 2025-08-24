@@ -18,7 +18,7 @@ export const CreateMarcaView = () => {
   };
 
   return (
-    <Container maxWidth="xl" sx={{ py: { xs: 2, sm: 4 }, px: { xs: 1, sm: 3, md: 4 } }}>
+    <Container maxWidth="xl" sx={{ py: { xs: 2, sm: 3, md: 4 }, px: { xs: 0.5, sm: 2, md: 3 } }}>
       <Stack spacing={6}>
         <Box>
           <FormButton

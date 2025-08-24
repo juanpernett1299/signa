@@ -1,6 +1,6 @@
 from pydantic import BaseModel
-from typing import List, Optional
-from datetime import datetime
+from typing import Optional, List
+from datetime import datetime, date
 from enum import Enum
 
 
@@ -42,10 +42,22 @@ class MarcaInDBBase(MarcaBase):
     id: int
     fecha_registro: datetime
 
-    model_config = {"from_attributes": True}
+    class Config:
+        from_attributes = True
+
 
 class MarcaPagination(BaseModel):
     items: List[MarcaInDBBase]
     total: int
     page: int
     limit: int
+
+
+class MarcaFilterParams(BaseModel):
+    nombre: Optional[str] = None
+    titular: Optional[str] = None
+    estados: Optional[List[EstadoMarca]] = None
+    fecha_desde: Optional[date] = None
+    fecha_hasta: Optional[date] = None
+    pais_id: Optional[int] = None
+    clase_niza_id: Optional[int] = None

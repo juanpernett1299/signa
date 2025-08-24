@@ -1,9 +1,33 @@
 from typing import List, Optional
 
 from .database import supabase
-from app.schemas.marca import MarcaCreate, MarcaUpdate, MarcaInDBBase
+from app.schemas.marca import MarcaCreate, MarcaUpdate, MarcaInDBBase, EstadoMarca, MarcaFilterParams
 from app.schemas.historial_estado import HistorialEstado
-from datetime import datetime
+from datetime import datetime, date
+
+
+def _apply_filters_to_query(
+    query,
+    filters: MarcaFilterParams,
+):
+    if filters.nombre:
+        search_pattern = f'*{filters.nombre}*'
+        query = query.ilike("nombre", search_pattern)
+    if filters.titular:
+        search_pattern = f'*{filters.titular}*'
+        query = query.ilike("titular", search_pattern)
+    if filters.estados:
+        estados_values = [estado.value for estado in filters.estados]
+        query = query.in_("estado", estados_values)
+    if filters.fecha_desde:
+        query = query.gte("fecha_registro", filters.fecha_desde.isoformat())
+    if filters.fecha_hasta:
+        query = query.lte("fecha_registro", filters.fecha_hasta.isoformat())
+    if filters.pais_id is not None:
+        query = query.eq("pais_id", filters.pais_id)
+    if filters.clase_niza_id is not None:
+        query = query.eq("clase_niza_id", filters.clase_niza_id)
+    return query
 
 
 def get(*, marca_id: int) -> Optional[MarcaInDBBase]:
@@ -18,12 +42,34 @@ def get(*, marca_id: int) -> Optional[MarcaInDBBase]:
         return None
 
 
-def get_multi(*, skip: int = 0, limit: int = 100) -> List[MarcaInDBBase]:
+def get_multi(
+    *, 
+    skip: int = 0, 
+    limit: int = 100,
+    filters: MarcaFilterParams,
+) -> List[MarcaInDBBase]:
     """
     Get multiple marcas with pagination.
     """
-    response = supabase.table("marcas").select("*").order("id", desc=True).range(skip, skip + limit - 1).execute()
+    query = supabase.table("marcas").select("*")
+    query = _apply_filters_to_query(query, filters)
+    
+    response = query.order("id", desc=True).range(skip, skip + limit - 1).execute()
     return [MarcaInDBBase(**marca) for marca in response.data]
+
+
+def count(
+    *,
+    filters: MarcaFilterParams,
+) -> int:
+    """
+    Count marcas with filtering.
+    """
+    query = supabase.table("marcas").select("id", count='exact')
+    query = _apply_filters_to_query(query, filters)
+
+    response = query.execute()
+    return response.count if response.count is not None else 0
 
 
 def create(*, marca_in: MarcaCreate) -> MarcaInDBBase:

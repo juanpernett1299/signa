@@ -21,6 +21,16 @@ export interface MarcaPaginationResponse {
   limit: number;
 }
 
+export interface MarcaFilterParams {
+  nombre?: string;
+  titular?: string;
+  estados?: EstadoMarca[];
+  fecha_desde?: string;
+  fecha_hasta?: string;
+  pais_id?: number;
+  clase_niza_id?: number;
+}
+
 // Tipo para crear una nueva marca (payload de la petición POST)
 // Omitimos 'id' y 'fecha_registro' que son generados por el backend
 export type MarcaCreate = Omit<Marca, 'id' | 'fecha_registro'>;

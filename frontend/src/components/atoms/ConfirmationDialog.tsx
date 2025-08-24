@@ -4,8 +4,10 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  Button
+  Button,
+  Box
 } from '@mui/material';
+import { FormButton } from './FormButton';
 
 interface ConfirmationDialogProps {
   open: boolean;
@@ -26,37 +28,71 @@ export const ConfirmationDialog = ({
     <Dialog
       open={open}
       onClose={onCancel}
+      maxWidth="sm"
+      fullWidth
       PaperProps={{
         sx: {
-          bgcolor: '#1e1e1e',
-          color: 'white',
+          bgcolor: '#000000',
           border: '1px solid #333333',
+          borderRadius: 2,
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.8)',
+          color: '#ffffff',
+          minWidth: 400
+        }
+      }}
+      BackdropProps={{
+        sx: {
+          bgcolor: 'rgba(0, 0, 0, 0.8)',
+          backdropFilter: 'blur(4px)'
         }
       }}
     >
-      <DialogTitle sx={{ fontWeight: 600 }}>{title}</DialogTitle>
-      <DialogContent>
-        <DialogContentText sx={{ color: '#cccccc' }}>
-          {content}
-        </DialogContentText>
-      </DialogContent>
-      <DialogActions sx={{ p: '0 24px 20px' }}>
-        <Button 
-          onClick={onCancel} 
-          sx={{ color: '#888888', '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.08)' } }}
+      <Box sx={{ p: 3 }}>
+        <DialogTitle 
+          sx={{ 
+            fontWeight: 600, 
+            fontSize: '1.25rem',
+            color: '#ffffff',
+            p: 0,
+            mb: 2
+          }}
         >
-          Cancelar
-        </Button>
-        <Button 
-          onClick={onConfirm} 
-          color="error" 
-          variant="contained"
-          sx={{ '&:hover': { bgcolor: 'darkred' } }}
-          autoFocus
-        >
-          Confirmar
-        </Button>
-      </DialogActions>
+          {title}
+        </DialogTitle>
+        
+        <DialogContent sx={{ p: 0, mb: 3 }}>
+          <DialogContentText 
+            sx={{ 
+              color: '#888888',
+              fontSize: '0.875rem',
+              lineHeight: 1.5
+            }}
+          >
+            {content}
+          </DialogContentText>
+        </DialogContent>
+        
+        <DialogActions sx={{ p: 0, gap: 2, justifyContent: 'flex-end' }}>
+          <FormButton
+            variant="outlined"
+            onClick={onCancel}
+          >
+            Cancelar
+          </FormButton>
+          <FormButton
+            onClick={onConfirm}
+            sx={{
+              bgcolor: '#dc2626',
+              color: '#ffffff',
+              '&:hover': {
+                bgcolor: '#b91c1c'
+              }
+            }}
+          >
+            Confirmar
+          </FormButton>
+        </DialogActions>
+      </Box>
     </Dialog>
   );
 };

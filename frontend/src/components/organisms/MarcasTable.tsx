@@ -99,7 +99,7 @@ export const MarcasTable = ({
             </TableRow>
           </TableHead>
           <TableBody>
-            {marcas.map((marca) => (
+            {marcas && marcas.map((marca) => (
               <MarcaTableRow key={marca.id} marca={marca} clasesNiza={clasesNiza} onDelete={onDelete} />
             ))}
           </TableBody>
