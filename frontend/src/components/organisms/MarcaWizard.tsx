@@ -1,37 +1,29 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Box, Typography, Stepper, Step, StepLabel } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { MarcaWizardStep1 } from '../molecules/MarcaWizardStep1';
 import { MarcaWizardStep2 } from '../molecules/MarcaWizardStep2';
 import { MarcaWizardStep3 } from '../molecules/MarcaWizardStep3';
 import { LoadingSpinner } from '../atoms/LoadingSpinner';
 import { getClasesNiza } from '../../services/claseNizaService';
 import { getPaises } from '../../services/paisService';
+import { createMarca, updateMarca } from '../../services/marcaService';
 import { useSnackbar } from '../../hooks/useSnackbar';
-import { useEffect } from 'react';
 import type { ClaseNiza } from '../../types/claseNiza';
 import type { Pais } from '../../types/pais';
+import type { MarcaCreate, MarcaUpdate } from '../../types/marca';
+import { EstadoMarca } from '../../types/estadoMarca';
 
-export interface MarcaData {
-  nombre: string;
-  descripcion: string;
-  paisId: string;
-  claseNizaId: string;
-  logoUrl: string;
-  estado: string;
-}
 
-export interface TitularData {
-  nombre: string;
-}
-
-export interface MarcaWizardData {
-  marca: MarcaData;
-  titular: TitularData;
+// Esta interfaz ahora coincide con los campos de la API
+export interface MarcaFormData extends Omit<MarcaCreate, 'estado' | 'clase_niza_id' | 'pais_id'> {
+  clase_niza_id: string;
+  pais_id: string;
+  estado: EstadoMarca;
 }
 
 interface MarcaWizardProps {
-  editData?: MarcaWizardData;
+  editData?: MarcaFormData;
   isEditing?: boolean;
 }
 
@@ -44,51 +36,43 @@ const steps = [
 export const MarcaWizard = ({ editData, isEditing = false }: MarcaWizardProps) => {
   const [activeStep, setActiveStep] = useState(0);
   const navigate = useNavigate();
-  const { showSnackbar, SnackbarComponent } = useSnackbar();
+  const { id } = useParams<{ id: string }>();
+  const { showSnackbar } = useSnackbar();
+
   const [clasesNiza, setClasesNiza] = useState<ClaseNiza[]>([]);
   const [paises, setPaises] = useState<Pais[]>([]);
   const [loading, setLoading] = useState(true);
-  const [wizardData, setWizardData] = useState<MarcaWizardData>(
+  const [submitting, setSubmitting] = useState(false);
+
+  const [formData, setFormData] = useState<MarcaFormData>(
     editData || {
-      marca: {
-        nombre: '',
-        descripcion: '',
-        paisId: '',
-        claseNizaId: '',
-        logoUrl: '',
-        estado: 'solicitud_presentada'
-      },
-      titular: {
-        nombre: ''
-      }
+      nombre: '',
+      descripcion: '',
+      titular: '',
+      pais_id: '',
+      clase_niza_id: '',
+      logo_url: '',
+      estado: EstadoMarca.SOLICITUD_PRESENTADA,
     }
   );
 
   useEffect(() => {
-    const loadData = async () => {
-      setLoading(true);
-      try {
-        const [clasesData, paisesData] = await Promise.all([
-          getClasesNiza(),
-          getPaises()
-        ]);
+    setLoading(true);
+    Promise.all([getClasesNiza(), getPaises()])
+      .then(([clasesData, paisesData]) => {
         setClasesNiza(clasesData);
         setPaises(paisesData);
-      } catch (error) {
-        console.error('Error loading data:', error);
-      } finally {
+      })
+      .catch(() => {
+        showSnackbar('Error al cargar datos necesarios para el formulario', 'error');
+      })
+      .finally(() => {
         setLoading(false);
-      }
-    };
-
-    loadData();
+      });
   }, []);
 
-  const handleNext = (stepData: Partial<MarcaData> | Partial<TitularData>, section: 'marca' | 'titular') => {
-    setWizardData(prev => ({
-      ...prev,
-      [section]: { ...prev[section], ...stepData }
-    }));
+  const handleNext = (stepData: Partial<MarcaFormData>) => {
+    setFormData(prev => ({ ...prev, ...stepData }));
     setActiveStep(prev => prev + 1);
   };
 
@@ -96,18 +80,34 @@ export const MarcaWizard = ({ editData, isEditing = false }: MarcaWizardProps) =
     setActiveStep(prev => prev - 1);
   };
 
-  const handleSubmit = async (finalData: MarcaWizardData) => {
-    console.log(isEditing ? 'Updating marca:' : 'Creating marca:', finalData);
-    // Aquí iría la llamada al servicio para crear la marca
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    const message = isEditing ? 'Marca actualizada exitosamente' : 'Marca creada exitosamente';
-    showSnackbar(message, 'success');
-    
-    // Navegar de vuelta a la lista después de un delay
-    setTimeout(() => {
-      navigate('/marcas');
-    }, 2000);
+  const handleSubmit = (finalData: MarcaFormData) => {
+    setSubmitting(true);
+
+    // Preparar los datos para la API (convertir IDs a números)
+    const apiData: MarcaCreate | MarcaUpdate = {
+      ...finalData,
+      clase_niza_id: parseInt(finalData.clase_niza_id, 10),
+      pais_id: parseInt(finalData.pais_id, 10),
+      estado: finalData.estado, // Ya es del tipo correcto
+    };
+
+    const action = isEditing && id
+      ? updateMarca(parseInt(id, 10), apiData as MarcaUpdate)
+      : createMarca(apiData as MarcaCreate);
+
+    action
+      .then(() => {
+        const message = isEditing ? 'Marca actualizada exitosamente' : 'Marca creada exitosamente';
+        showSnackbar(message, 'success');
+        navigate('/marcas')
+      })
+      .catch(() => {
+        const message = isEditing ? 'Error al actualizar la marca' : 'Error al crear la marca';
+        showSnackbar(message, 'error');
+      })
+      .finally(() => {
+        setSubmitting(false);
+      });
   };
 
   const claseNizaOptions = clasesNiza.map(clase => ({
@@ -127,7 +127,7 @@ export const MarcaWizard = ({ editData, isEditing = false }: MarcaWizardProps) =
       case 0:
         return (
           <MarcaWizardStep1
-            data={wizardData.marca}
+            data={formData}
             onNext={handleNext}
             isEditing={isEditing}
           />
@@ -135,22 +135,21 @@ export const MarcaWizard = ({ editData, isEditing = false }: MarcaWizardProps) =
       case 1:
         return (
           <MarcaWizardStep2
-            data={wizardData.titular}
+            data={formData}
             onNext={handleNext}
             onBack={handleBack}
           />
         );
       case 2:
         return (
-          loading ? (
+          loading || submitting ? (
             <LoadingSpinner 
-              message="Preparando resumen..." 
+              message={submitting ? (isEditing ? 'Actualizando marca...' : 'Creando marca...') : "Preparando resumen..."}
               fullHeight={true}
             />
           ) : (
             <MarcaWizardStep3
-              marcaData={wizardData.marca}
-              titularData={wizardData.titular}
+              marcaData={formData}
               onBack={handleBack}
               onSubmit={handleSubmit}
               paisOptions={paisOptions}
@@ -165,7 +164,6 @@ export const MarcaWizard = ({ editData, isEditing = false }: MarcaWizardProps) =
   };
 
   return (
-    <>
     <Box
       sx={{
         bgcolor: '#111111',
@@ -193,28 +191,17 @@ export const MarcaWizard = ({ editData, isEditing = false }: MarcaWizardProps) =
         <Stepper 
           activeStep={activeStep} 
           sx={{
-            '& .MuiStepLabel-root': {
-              color: '#888888'
-            },
+            '& .MuiStepLabel-root': { color: '#888888' },
             '& .MuiStepLabel-label': {
               color: '#888888',
               fontSize: '0.875rem',
-              '&.Mui-active': {
-                color: '#ffffff',
-                fontWeight: 500
-              },
-              '&.Mui-completed': {
-                color: '#00ff88'
-              }
+              '&.Mui-active': { color: '#ffffff', fontWeight: 500 },
+              '&.Mui-completed': { color: '#00ff88' }
             },
             '& .MuiStepIcon-root': {
               color: '#333333',
-              '&.Mui-active': {
-                color: '#ffffff'
-              },
-              '&.Mui-completed': {
-                color: '#00ff88'
-              }
+              '&.Mui-active': { color: '#ffffff' },
+              '&.Mui-completed': { color: '#00ff88' }
             }
           }}
         >
@@ -229,8 +216,5 @@ export const MarcaWizard = ({ editData, isEditing = false }: MarcaWizardProps) =
       {/* Step Content */}
       {renderStepContent()}
     </Box>
-
-      <SnackbarComponent />
-    </>
   );
 };

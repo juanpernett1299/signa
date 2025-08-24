@@ -104,6 +104,7 @@ export const SideBar = ({ open, onClose }: SideBarProps) => {
           keepMounted: true
         }}
         sx={{
+          overflowX: 'hidden',
           display: { xs: 'block', md: 'none' },
           '& .MuiDrawer-paper': {
             boxSizing: 'border-box',
@@ -124,6 +125,7 @@ export const SideBar = ({ open, onClose }: SideBarProps) => {
           display: { xs: 'none', md: 'block' },
           '& .MuiDrawer-paper': {
             boxSizing: 'border-box',
+            overflowX: 'hidden',
             width: drawerWidth,
             bgcolor: '#000000',
             border: 'none',

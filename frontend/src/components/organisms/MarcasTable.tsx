@@ -25,6 +25,7 @@ interface MarcasTableProps {
   itemsPerPage: number;
   onPageChange: (page: number) => void;
   onItemsPerPageChange: (itemsPerPage: number) => void;
+  onDelete: (id: number) => void;
 }
 
 export const MarcasTable = ({ 
@@ -35,17 +36,18 @@ export const MarcasTable = ({
   totalItems, 
   itemsPerPage, 
   onPageChange, 
-  onItemsPerPageChange 
+  onItemsPerPageChange,
+  onDelete
 }: MarcasTableProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   if (isMobile) {
     return (
-      <Box>
+      <Box width="100%">
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           {marcas.map((marca) => (
-            <MarcaCard key={marca.id} marca={marca} clasesNiza={clasesNiza} />
+            <MarcaCard key={marca.id} marca={marca} clasesNiza={clasesNiza} onDelete={onDelete} />
           ))}
         </Box>
         <PaginationComponent
@@ -61,7 +63,7 @@ export const MarcasTable = ({
   }
 
   return (
-    <Box>
+    <Box width="100%">
       <TableContainer
         component={Paper}
         sx={{
@@ -98,7 +100,7 @@ export const MarcasTable = ({
           </TableHead>
           <TableBody>
             {marcas.map((marca) => (
-              <MarcaTableRow key={marca.id} marca={marca} clasesNiza={clasesNiza} />
+              <MarcaTableRow key={marca.id} marca={marca} clasesNiza={clasesNiza} onDelete={onDelete} />
             ))}
           </TableBody>
         </Table>

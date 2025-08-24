@@ -10,21 +10,23 @@ import { getClasesNiza } from '../../services/claseNizaService';
 import { getPaises } from '../../services/paisService';
 import type { ClaseNiza } from '../../types/claseNiza';
 import type { Pais } from '../../types/pais';
-import type { MarcaData } from '../organisms/MarcaWizard';
+import type { MarcaFormData } from '../organisms/MarcaWizard';
+import { EstadoMarca } from '../../types/estadoMarca';
+import { useSnackbar } from '../../hooks/useSnackbar';
 
 interface MarcaWizardStep1Props {
-  data: MarcaData;
-  onNext: (stepData: Partial<MarcaData>, section: 'marca' | 'titular') => void;
+  data: MarcaFormData;
+  onNext: (stepData: Partial<MarcaFormData>, section: 'marca' | 'titular') => void;
   isEditing?: boolean;
 }
 
 interface Step1FormValues {
   nombre: string;
   descripcion: string;
-  logoUrl: string;
-  paisId: string;
-  claseNizaId: string;
-  estado: string;
+  logo_url: string;
+  pais_id: string;
+  clase_niza_id: string;
+  estado: EstadoMarca;
 }
 
 const validationSchema = Yup.object({
@@ -33,11 +35,11 @@ const validationSchema = Yup.object({
     .min(2, 'El nombre debe tener al menos 2 caracteres'),
   descripcion: Yup.string()
     .max(500, 'La descripción no puede exceder 500 caracteres'),
-  logoUrl: Yup.string()
+  logo_url: Yup.string()
     .url('Debe ser una URL válida'),
-  paisId: Yup.string()
+  pais_id: Yup.string()
     .required('Debe seleccionar un país'),
-  claseNizaId: Yup.string()
+  clase_niza_id: Yup.string()
     .required('Debe seleccionar una clase Niza'),
   estado: Yup.string()
     .required('Debe seleccionar un estado')
@@ -48,7 +50,8 @@ export const MarcaWizardStep1 = ({ data, onNext, isEditing = false }: MarcaWizar
   const [paises, setPaises] = useState<Pais[]>([]);
   const [loadingClases, setLoadingClases] = useState(true);
   const [loadingPaises, setLoadingPaises] = useState(true);
-
+  const { showSnackbar } = useSnackbar();
+  
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -59,7 +62,7 @@ export const MarcaWizardStep1 = ({ data, onNext, isEditing = false }: MarcaWizar
         setClasesNiza(clasesData);
         setPaises(paisesData);
       } catch (error) {
-        console.error('Error loading data:', error);
+        showSnackbar('Error al cargar los datos', 'error');
       } finally {
         setLoadingClases(false);
         setLoadingPaises(false);
@@ -72,9 +75,9 @@ export const MarcaWizardStep1 = ({ data, onNext, isEditing = false }: MarcaWizar
   const initialValues: Step1FormValues = {
     nombre: data.nombre,
     descripcion: data.descripcion,
-    logoUrl: data.logoUrl,
-    paisId: data.paisId,
-    claseNizaId: data.claseNizaId,
+    logo_url: data.logo_url,
+    pais_id: data.pais_id,
+    clase_niza_id: data.clase_niza_id,
     estado: data.estado
   };
 
@@ -120,20 +123,20 @@ export const MarcaWizardStep1 = ({ data, onNext, isEditing = false }: MarcaWizar
               />
 
               <FormField
-                name="logoUrl"
+                name="logo_url"
                 label="URL del Logo"
                 placeholder="https://ejemplo.com/logo.png"
               />
 
               <FormSelect
-                name="paisId"
+                name="pais_id"
                 label="País"
                 options={paisOptions}
                 loading={loadingPaises}
               />
 
               <FormSelect
-                name="claseNizaId"
+                name="clase_niza_id"
                 label="Clase Niza"
                 options={claseNizaOptions}
                 loading={loadingClases}

@@ -3,6 +3,7 @@ import { CssBaseline } from '@mui/material';
 import { BrowserRouter } from 'react-router-dom';
 import { AppRouter } from './router/AppRouter';
 import { Layout } from './components/organisms/Layout';
+import { SnackbarProvider } from './hooks/useSnackbar';
 
 const darkTheme = createTheme({
   palette: {
@@ -54,9 +55,11 @@ function App() {
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
       <BrowserRouter>
-        <Layout>
-          <AppRouter />
-        </Layout>
+        <SnackbarProvider>
+          <Layout>
+            <AppRouter />
+          </Layout>
+        </SnackbarProvider>
       </BrowserRouter>
     </ThemeProvider>
   );

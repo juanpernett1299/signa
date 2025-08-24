@@ -1,5 +1,5 @@
 import { Chip } from '@mui/material';
-import { EstadoMarca, estadoLabels } from '../../types/marca';
+import { EstadoMarca, estadoLabels } from '../../types/estadoMarca';
 
 interface StatusChipProps {
   estado: EstadoMarca;

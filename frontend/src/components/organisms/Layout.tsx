@@ -34,11 +34,17 @@ export const Layout = ({ children }: LayoutProps) => {
           bgcolor: '#000000',
           minHeight: '100vh',
           ml: { md: '240px' },
-          pt: '64px'
+          // Apply padding correctly to reserve space for the TopBar and around the content
+          pt: '64px',
+          px: 3, // Horizontal padding (left and right)
+          pb: 3, // Bottom padding
         }}
       >
         <Box sx={{
-        width:'100%'
+          width:'100%',
+          maxWidth: '1400px',
+          // Center this container within the main area using auto margins
+          mx: 'auto',
         }}>
           {children}
         </Box>

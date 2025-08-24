@@ -16,5 +16,5 @@ def read_clases_niza():
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error retrieving clases niza: {str(e)}"
+            detail=f"Error obteniendo las clases niza: {str(e)}"
         )
