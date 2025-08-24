@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Box } from '@mui/material';
+import { useTheme, useMediaQuery } from '@mui/material';
 import { TopBar } from '../molecules/TopBar';
 import { SideBar } from '../molecules/SideBar';
 
@@ -8,10 +9,20 @@ interface LayoutProps {
 }
 
 export const Layout = ({ children }: LayoutProps) => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false); // Mobile sidebar state
+  const [sidebarExpanded, setSidebarExpanded] = useState(true); // Desktop sidebar state
+  
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const handleMenuClick = () => {
-    setSidebarOpen(!sidebarOpen);
+    if (isMobile) {
+      // En mobile: solo toggle open/close
+      setSidebarOpen(!sidebarOpen);
+    } else {
+      // En desktop: solo toggle expanded/collapsed
+      setSidebarExpanded(!sidebarExpanded);
+    }
   };
 
   const handleSidebarClose = () => {
@@ -24,6 +35,7 @@ export const Layout = ({ children }: LayoutProps) => {
       
       <SideBar
         open={sidebarOpen}
+        expanded={sidebarExpanded}
         onClose={handleSidebarClose}
       />
 
@@ -33,11 +45,12 @@ export const Layout = ({ children }: LayoutProps) => {
           flexGrow: 1,
           bgcolor: '#000000',
           minHeight: '100vh',
-          ml: { md: '240px' },
+          ml: { md: sidebarExpanded ? '240px' : '64px' },
+          transition: 'margin-left 0.3s ease-in-out',
           // Apply padding correctly to reserve space for the TopBar and around the content
           pt: '64px',
-          px: 3, // Horizontal padding (left and right)
-          pb: 3, // Bottom padding
+          px: { xs: 1, sm: 2, md: 3 }, // Responsive horizontal padding
+          pb: { xs: 1, sm: 2, md: 3 }, // Responsive bottom padding
         }}
       >
         <Box sx={{

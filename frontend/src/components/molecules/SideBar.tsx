@@ -7,13 +7,15 @@ import {
   ListItemText,
   Box,
   useMediaQuery,
-  useTheme
+  useTheme,
+  Tooltip
 } from '@mui/material';
+import { Copyright } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Icon } from '../atoms/Icon';
 
 interface SideBarProps {
   open: boolean;
+  expanded: boolean;
   onClose: () => void;
 }
 
@@ -21,18 +23,18 @@ const menuItems = [
   {
     id: 'marcas',
     label: 'Marcas',
-    icon: 'trademark' as const,
+    icon: Copyright,
     path: '/marcas'
   }
 ];
 
-export const SideBar = ({ open, onClose }: SideBarProps) => {
+export const SideBar = ({ open, expanded, onClose }: SideBarProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const navigate = useNavigate();
   const location = useLocation();
 
-  const drawerWidth = 240;
+  const drawerWidth = expanded ? 240 : 64;
 
   const handleItemClick = (path: string) => {
     navigate(path);
@@ -41,52 +43,79 @@ export const SideBar = ({ open, onClose }: SideBarProps) => {
 
   const isSelected = (path: string) => location.pathname === path;
 
-  const drawerContent = (
-    <Box sx={{ width: drawerWidth, height: '100%', bgcolor: '#000000' }}>
+  const drawerContent = (expanded: boolean) => (
+    <Box sx={{ 
+      width: drawerWidth, 
+      height: '100%', 
+      bgcolor: '#000000',
+      transition: 'width 0.3s ease-in-out',
+      overflow: 'hidden'
+    }}>
       <Box sx={{ height: 64 }} /> {/* Spacer for topbar */}
       
       <List sx={{ px: 2, py: 2 }}>
         {menuItems.map((item) => (
           <ListItem key={item.id} disablePadding sx={{ mb: 1 }}>
-            <ListItemButton
-              selected={isSelected(item.path)}
-              onClick={() => {
-                handleItemClick(item.path);
-              }}
-              sx={{
-                borderRadius: 1,
-                minHeight: 44,
-                color: isSelected(item.path) ? '#ffffff' : '#888888',
-                bgcolor: isSelected(item.path) ? '#111111' : 'transparent',
-                '&:hover': {
-                  bgcolor: '#111111',
-                  color: '#ffffff'
-                },
-                '&.Mui-selected': {
-                  bgcolor: '#111111',
-                  color: '#ffffff',
-                  '&:hover': {
-                    bgcolor: '#1a1a1a'
+            <Tooltip 
+              title={!expanded ? item.label : ''} 
+              placement="right"
+              arrow
+              componentsProps={{
+                tooltip: {
+                  sx: {
+                    bgcolor: '#333333',
+                    color: '#ffffff',
+                    fontSize: '0.75rem'
                   }
                 }
               }}
             >
-              <ListItemIcon
+              <ListItemButton
+                selected={isSelected(item.path)}
+                onClick={() => {
+                  handleItemClick(item.path);
+                }}
                 sx={{
-                  minWidth: 36,
-                  color: 'inherit'
+                  borderRadius: 1,
+                  minHeight: 44,
+                  color: isSelected(item.path) ? '#ffffff' : '#888888',
+                  bgcolor: isSelected(item.path) ? '#111111' : 'transparent',
+                  justifyContent: expanded ? 'initial' : 'center',
+                  px: expanded ? 2 : 1.5,
+                  '&:hover': {
+                    bgcolor: '#111111',
+                    color: '#ffffff'
+                  },
+                  '&.Mui-selected': {
+                    bgcolor: '#111111',
+                    color: '#ffffff',
+                    '&:hover': {
+                      bgcolor: '#1a1a1a'
+                    }
+                  }
                 }}
               >
-                <Icon name={item.icon} fontSize="small" />
-              </ListItemIcon>
-              <ListItemText
-                primary={item.label}
-                primaryTypographyProps={{
-                  fontSize: '0.875rem',
-                  fontWeight: isSelected(item.path) ? 500 : 400
-                }}
-              />
-            </ListItemButton>
+                <ListItemIcon
+                  sx={{
+                    minWidth: expanded ? 36 : 0,
+                    mr: expanded ? 1 : 0,
+                    color: 'inherit',
+                    justifyContent: 'center'
+                  }}
+                >
+                  <item.icon fontSize="small" />
+                </ListItemIcon>
+                {expanded && (
+                  <ListItemText
+                    primary={item.label}
+                    primaryTypographyProps={{
+                      fontSize: '0.875rem',
+                      fontWeight: isSelected(item.path) ? 500 : 400
+                    }}
+                  />
+                )}
+              </ListItemButton>
+            </Tooltip>
           </ListItem>
         ))}
       </List>
@@ -108,14 +137,14 @@ export const SideBar = ({ open, onClose }: SideBarProps) => {
           display: { xs: 'block', md: 'none' },
           '& .MuiDrawer-paper': {
             boxSizing: 'border-box',
-            width: drawerWidth,
+            width: 240, // Always full width on mobile
             bgcolor: '#000000',
             border: 'none',
             borderRight: '1px solid #333333'
           }
         }}
       >
-        {drawerContent}
+        {drawerContent(true)} {/* Always expanded on mobile */}
       </Drawer>
 
       {/* Desktop drawer */}
@@ -129,12 +158,13 @@ export const SideBar = ({ open, onClose }: SideBarProps) => {
             width: drawerWidth,
             bgcolor: '#000000',
             border: 'none',
-            borderRight: '1px solid #333333'
+            borderRight: '1px solid #333333',
+            transition: 'width 0.3s ease-in-out'
           }
         }}
         open
       >
-        {drawerContent}
+        {drawerContent(expanded)}
       </Drawer>
     </>
   );

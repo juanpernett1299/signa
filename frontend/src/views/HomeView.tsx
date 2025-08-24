@@ -3,12 +3,13 @@ import { Add } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { Container, Box, Typography, Stack } from '@mui/material';
 import { MarcasTable } from '../components/organisms/MarcasTable';
-import { getMarcas, deleteMarca } from '../services/marcaService';
+import { FiltersBar } from '../components/organisms/FiltersBar';
+import { getMarcasPaginadas, deleteMarca } from '../services/marcaService';
 import { getClasesNiza } from '../services/claseNizaService';
 import { LoadingSpinner } from '../components/atoms/LoadingSpinner';
 import { FormButton } from '../components/atoms/FormButton';
 import { ConfirmationDialog } from '../components/atoms/ConfirmationDialog';
-import type { Marca, MarcaPaginationResponse } from '../types/marca';
+import type { Marca, MarcaPaginationResponse, MarcaFilterParams } from '../types/marca';
 import type { ClaseNiza } from '../types/claseNiza';
 import { useSnackbar } from '../hooks/useSnackbar';
 
@@ -16,6 +17,7 @@ export const HomeView = () => {
   const navigate = useNavigate();
   const [marcas, setMarcas] = useState<Marca[]>([]);
   const [clasesNiza, setClasesNiza] = useState<ClaseNiza[]>([]);
+  const [filters, setFilters] = useState<MarcaFilterParams>({});
   const [paginationData, setPaginationData] = useState<{
     total: number;
     page: number;
@@ -33,8 +35,8 @@ export const HomeView = () => {
 
   const loadMarcas = (page: number = 1, limit: number = 10) => {
     setLoading(true);
-    getMarcas(page - 1, limit) // API usa 0-based indexing
-      .then(response => {
+    getMarcasPaginadas(page - 1, limit, filters)
+      .then((response: MarcaPaginationResponse) => {
         setMarcas(response.items);
         setPaginationData({
           total: response.total,
@@ -42,7 +44,7 @@ export const HomeView = () => {
           limit: response.limit
         });
       })
-      .catch(err => {
+      .catch((err: any) => {
         showSnackbar('Error al cargar las marcas', 'error');
       })
       .finally(() => {
@@ -61,16 +63,23 @@ export const HomeView = () => {
   };
 
   useEffect(() => {
-    loadMarcas(paginationData.page, paginationData.limit);
     loadClasesNiza();
   }, []);
+
+  useEffect(() => {
+    loadMarcas(1, paginationData.limit);
+  }, [filters]);
 
   const handlePageChange = (page: number) => {
     loadMarcas(page, paginationData.limit);
   };
 
   const handleItemsPerPageChange = (itemsPerPage: number) => {
-    loadMarcas(1, itemsPerPage); // Reset to first page when changing items per page
+    loadMarcas(1, itemsPerPage);
+  };
+
+  const handleFiltersChange = (newFilters: MarcaFilterParams) => {
+    setFilters(newFilters);
   };
 
   const handleDeleteRequest = (id: number) => {
@@ -107,7 +116,7 @@ export const HomeView = () => {
   };
 
   return (
-    <Container maxWidth="xl" sx={{ py: 4, px: { xs: 2, sm: 3, md: 4 } }}>
+    <Container maxWidth="xl" sx={{ py: { xs: 2, sm: 3, md: 4 }, px: { xs: 1, sm: 2, md: 3 } }}>
       <Stack spacing={4}>
         <Box display="flex" justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={2}>
           <Box>
@@ -137,6 +146,8 @@ export const HomeView = () => {
             Nueva Marca
           </FormButton>
         </Box>
+        
+        <FiltersBar onFiltersChange={handleFiltersChange} />
         
         {loading ? (
           <LoadingSpinner 

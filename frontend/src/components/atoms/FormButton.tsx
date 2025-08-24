@@ -4,7 +4,7 @@ interface FormButtonProps {
   type?: 'button' | 'submit' | 'reset';
   variant?: 'contained' | 'outlined' | 'text';
   children: React.ReactNode;
-  onClick?: () => void;
+  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
   disabled?: boolean;
   loading?: boolean;
   sx?: object;

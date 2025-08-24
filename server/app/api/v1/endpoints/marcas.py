@@ -1,7 +1,9 @@
 from fastapi import APIRouter, HTTPException, status
-from typing import List
+from typing import Optional
+import json
+from pydantic import ValidationError, parse_obj_as
 
-from app.schemas.marca import EstadoMarca, MarcaInDBBase, MarcaCreate, MarcaPagination, MarcaUpdate
+from app.schemas.marca import EstadoMarca, MarcaInDBBase, MarcaCreate, MarcaPagination, MarcaUpdate, MarcaFilterParams
 from app.db import marca as marcaDAO
 
 router = APIRouter()
@@ -10,17 +12,33 @@ router = APIRouter()
 @router.get("/", response_model=MarcaPagination)
 def read_marcas(
     skip: int = 0,
-    limit: int = 100
+    limit: int = 100,
+    filters: Optional[str] = None
 ):
     """
     Retrieve marcas.
     """
+    filter_params = MarcaFilterParams()
+    if filters:
+        try:
+            filter_params = parse_obj_as(MarcaFilterParams, json.loads(filters))
+        except (json.JSONDecodeError, ValidationError) as e:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Invalid filters format: {e}"
+            )
+
     try:
-        marcas = marcaDAO.get_multi(skip=skip, limit=limit)
+        marcas = marcaDAO.get_multi(
+            skip=skip, 
+            limit=limit,
+            filters=filter_params
+        )
+        total = marcaDAO.count(filters=filter_params)
         return MarcaPagination(
             items=marcas,
-            total=len(marcas),
-            page=skip,
+            total=total,
+            page=skip // limit,
             limit=limit
         )
     except Exception as e:

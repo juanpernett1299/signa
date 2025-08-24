@@ -66,6 +66,10 @@ export const FormSelect = ({ name, label, options, loading = false }: FormSelect
               '& .MuiMenuItem-root': {
                 color: '#ffffff',
                 fontSize: '0.875rem',
+               whiteSpace: 'nowrap',
+               overflow: 'hidden',
+               textOverflow: 'ellipsis',
+               maxWidth: '100%',
                 '&:hover': {
                   bgcolor: '#222222',
                 },
