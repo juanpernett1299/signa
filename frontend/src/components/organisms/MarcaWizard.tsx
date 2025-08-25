@@ -101,9 +101,9 @@ export const MarcaWizard = ({ editData, isEditing = false }: MarcaWizardProps) =
         showSnackbar(message, 'success');
         navigate('/marcas')
       })
-      .catch(() => {
+      .catch((e) => {
         const message = isEditing ? 'Error al actualizar la marca' : 'Error al crear la marca';
-        showSnackbar(message, 'error');
+        showSnackbar(e.response.data.detail || message, 'error');
       })
       .finally(() => {
         setSubmitting(false);
