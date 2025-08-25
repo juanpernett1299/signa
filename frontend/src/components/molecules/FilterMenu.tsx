@@ -8,7 +8,8 @@ import {
   OutlinedInput,
   Checkbox,
   Divider,
-  MenuItem
+  MenuItem,
+  TextField
 } from '@mui/material';
 import { 
   Copyright,
@@ -24,6 +25,8 @@ import { EstadoMarca } from '../../types/estadoMarca';
 import type { ClaseNiza } from '../../types/claseNiza';
 import type { Pais } from '../../types/pais';
 import type { MarcaFilterParams } from '../../types/marca';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import dayjs from 'dayjs';
 
 export type FilterType = 'marca' | 'titular' | 'estado' | 'fecha_desde' | 'fecha_hasta' | 'pais' | 'clase_niza';
 
@@ -136,6 +139,29 @@ export const FilterMenu = ({
     handleInputChange('estado', typeof value === 'string' ? value.split(',') : value);
   };
 
+  const formInputStyles = {
+    '& .MuiOutlinedInput-root': {
+      // height: 32,
+      color: '#ffffff',
+      backgroundColor: 'rgba(0, 0, 0, 0)',
+      '& .MuiOutlinedInput-notchedOutline': {
+        borderColor: '#333333',
+      },
+      '&:hover .MuiOutlinedInput-notchedOutline': {
+        borderColor: '#555555',
+      },
+      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+        borderColor: '#ffffff',
+      },
+    },
+    '& .MuiInputBase-input': {
+      fontSize: '0.8125rem',
+    },
+    '& .MuiSvgIcon-root': {
+      color: '#888888',
+    },
+  };
+
   const menuPaperStyles = {
     bgcolor: '#000000',
     border: '1px solid #333333',
@@ -169,7 +195,7 @@ export const FilterMenu = ({
       minHeight: 'auto'
     },
     '& .MuiOutlinedInput-root': {
-      bgcolor: '#000000',
+      bgcolor: '#1e1e1e',
       '& fieldset': {
         borderColor: '#333333',
       },
@@ -209,28 +235,13 @@ export const FilterMenu = ({
               Marca
             </Typography>
           </Box>
-          <input
-            type="text"
+          <TextField
+            size="small"
+            fullWidth
             value={formData.marca}
             placeholder="Buscar por marca"
             onChange={(e) => handleInputChange('marca', e.target.value)}
-            style={{
-              width: '100%',
-              height: '32px',
-              backgroundColor: '#000000',
-              border: '1px solid #333333',
-              borderRadius: '4px',
-              color: '#ffffff',
-              fontSize: '0.8125rem',
-              padding: '0 6px',
-              outline: 'none'
-            }}
-            onFocus={(e) => {
-              e.target.style.borderColor = '#ffffff';
-            }}
-            onBlur={(e) => {
-              e.target.style.borderColor = '#333333';
-            }}
+            sx={formInputStyles}
           />
         </Box>
 
@@ -242,28 +253,13 @@ export const FilterMenu = ({
               Titular
             </Typography>
           </Box>
-          <input
-            type="text"
+          <TextField
+            size="small"
+            fullWidth
             value={formData.titular}
             placeholder="Buscar por titular"
             onChange={(e) => handleInputChange('titular', e.target.value)}
-            style={{
-              width: '100%',
-              height: '32px',
-              backgroundColor: '#000000',
-              border: '1px solid #333333',
-              borderRadius: '4px',
-              color: '#ffffff',
-              fontSize: '0.8125rem',
-              padding: '0 6px',
-              outline: 'none'
-            }}
-            onFocus={(e) => {
-              e.target.style.borderColor = '#ffffff';
-            }}
-            onBlur={(e) => {
-              e.target.style.borderColor = '#333333';
-            }}
+            sx={formInputStyles}
           />
         </Box>
 
@@ -280,7 +276,6 @@ export const FilterMenu = ({
               multiple
               value={formData.estado}
               onChange={handleEstadoChange}
-              input={<OutlinedInput />}
               renderValue={(selected) => (
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                   {selected.map((value) => (
@@ -288,27 +283,6 @@ export const FilterMenu = ({
                   ))}
                 </Box>
               )}
-              sx={{
-                minHeight: 32,
-                fontSize: '0.8125rem',
-                color: '#ffffff',
-                bgcolor: '#000000',
-                '& .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#333333',
-                },
-                '&:hover .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#555555',
-                },
-                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#ffffff',
-                },
-                '& .MuiSelect-icon': {
-                  color: '#888888',
-                },
-                '& .MuiSelect-multiple': {
-                  py: 0.5
-                }
-              }}
               MenuProps={{
                 PaperProps: {
                   sx: {
@@ -326,6 +300,9 @@ export const FilterMenu = ({
                 }
               }}
             >
+              <MenuItem value="" disabled>
+                Seleccionar estado
+              </MenuItem>
               {Object.values(EstadoMarca).map((estado) => (
                 <MenuItem
                   key={estado}
@@ -363,26 +340,16 @@ export const FilterMenu = ({
               Fecha desde
             </Typography>
           </Box>
-          <input
-            type="date"
-            value={formData.fecha_desde}
-            onChange={(e) => handleInputChange('fecha_desde', e.target.value)}
-            style={{
-              width: '100%',
-              height: '32px',
-              backgroundColor: '#000000',
-              border: '1px solid #333333',
-              borderRadius: '4px',
-              color: '#ffffff',
-              fontSize: '0.8125rem',
-              padding: '0 6px',
-              outline: 'none'
-            }}
-            onFocus={(e) => {
-              e.target.style.borderColor = '#ffffff';
-            }}
-            onBlur={(e) => {
-              e.target.style.borderColor = '#333333';
+          <DatePicker
+            value={formData.fecha_desde ? dayjs(formData.fecha_desde) : null}
+            onChange={(date) => handleInputChange('fecha_desde', date ? date.format('YYYY-MM-DD') : '')}
+            slotProps={{
+              textField: {
+                size: 'small',
+                fullWidth: true,
+                placeholder: 'MM/DD/YYYY',
+                sx: formInputStyles
+              }
             }}
           />
         </Box>
@@ -395,26 +362,16 @@ export const FilterMenu = ({
               Fecha hasta
             </Typography>
           </Box>
-          <input
-            type="date"
-            value={formData.fecha_hasta}
-            onChange={(e) => handleInputChange('fecha_hasta', e.target.value)}
-            style={{
-              width: '100%',
-              height: '32px',
-              backgroundColor: '#000000',
-              border: '1px solid #333333',
-              borderRadius: '4px',
-              color: '#ffffff',
-              fontSize: '0.8125rem',
-              padding: '0 6px',
-              outline: 'none'
-            }}
-            onFocus={(e) => {
-              e.target.style.borderColor = '#ffffff';
-            }}
-            onBlur={(e) => {
-              e.target.style.borderColor = '#333333';
+          <DatePicker
+            value={formData.fecha_hasta ? dayjs(formData.fecha_hasta) : null}
+            onChange={(date) => handleInputChange('fecha_hasta', date ? date.format('YYYY-MM-DD') : '')}
+            slotProps={{
+              textField: {
+                size: 'small',
+                fullWidth: true,
+                placeholder: 'MM/DD/YYYY',
+                sx: formInputStyles
+              }
             }}
           />
         </Box>
@@ -433,21 +390,9 @@ export const FilterMenu = ({
               onChange={(e) => handleInputChange('pais', e.target.value)}
               displayEmpty
               sx={{
-                height: 32,
-                fontSize: '0.8125rem',
-                color: '#ffffff',
-                bgcolor: '#000000',
-                '& .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#333333',
-                },
-                '&:hover .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#555555',
-                },
-                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#ffffff',
-                },
-                '& .MuiSelect-icon': {
-                  color: '#888888',
+                ...formInputStyles, 
+                '& .MuiPaper-root': {
+                  backgroundColor: 'rgba(0, 0, 0, 0)',
                 }
               }}
               MenuProps={{
@@ -495,24 +440,7 @@ export const FilterMenu = ({
               value={formData.clase_niza}
               onChange={(e) => handleInputChange('clase_niza', e.target.value)}
               displayEmpty
-              sx={{
-                height: 32,
-                fontSize: '0.8125rem',
-                color: '#ffffff',
-                bgcolor: '#000000',
-                '& .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#333333',
-                },
-                '&:hover .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#555555',
-                },
-                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#ffffff',
-                },
-                '& .MuiSelect-icon': {
-                  color: '#888888',
-                }
-              }}
+              sx={formInputStyles}
               MenuProps={{
                 PaperProps: {
                   sx: {

@@ -36,7 +36,7 @@
             }
           },
           {
-            "name": "nombre",
+            "name": "filters",
             "in": "query",
             "required": false,
             "schema": {
@@ -48,100 +48,7 @@
                   "type": "null"
                 }
               ],
-              "title": "Nombre"
-            }
-          },
-          {
-            "name": "titular",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Titular"
-            }
-          },
-          {
-            "name": "estados",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/components/schemas/EstadoMarca"
-              }
-            }
-          },
-          {
-            "name": "fecha_desde",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string",
-                  "format": "date"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Fecha Desde"
-            }
-          },
-          {
-            "name": "fecha_hasta",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string",
-                  "format": "date"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Fecha Hasta"
-            }
-          },
-          {
-            "name": "pais_id",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "integer"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Pais Id"
-            }
-          },
-          {
-            "name": "clase_niza_id",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "integer"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Clase Niza Id"
+              "title": "Filters"
             }
           }
         ],
@@ -396,35 +303,31 @@
         }
       }
     },
-    "/": {
+    "/{full_path}": {
       "get": {
-        "summary": "Root",
-        "operationId": "root__get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-
-                }
-              }
+        "summary": "Serve React App",
+        "operationId": "serve_react_app__full_path__get",
+        "parameters": [
+          {
+            "name": "full_path",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Full Path"
             }
           }
-        }
-      }
-    },
-    "/health": {
-      "get": {
-        "summary": "Health Check",
-        "operationId": "health_check_health_get",
+        ],
         "responses": {
           "200": {
-            "description": "Successful Response",
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
             "content": {
               "application/json": {
                 "schema": {
-
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }

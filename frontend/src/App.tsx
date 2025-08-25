@@ -4,6 +4,12 @@ import { BrowserRouter } from 'react-router-dom';
 import { AppRouter } from './router/AppRouter';
 import { Layout } from './components/organisms/Layout';
 import { SnackbarProvider } from './hooks/useSnackbar';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import 'dayjs/locale/es';
+import dayjs from 'dayjs';
+
+dayjs.locale('es');
 
 const darkTheme = createTheme({
   palette: {
@@ -55,11 +61,13 @@ function App() {
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
       <BrowserRouter>
-        <SnackbarProvider>
-          <Layout>
-            <AppRouter />
-          </Layout>
-        </SnackbarProvider>
+        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="es">
+          <SnackbarProvider>
+            <Layout>
+              <AppRouter />
+            </Layout>
+          </SnackbarProvider>
+        </LocalizationProvider>
       </BrowserRouter>
     </ThemeProvider>
   );
